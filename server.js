@@ -1,10 +1,12 @@
 const { readFile, writeFile } = require('node:fs/promises');
 const http = require('node:http');
 
+
 const server = http.createServer((req, res) => {
     const {url, method} = req;
     if (method === 'GET') {
         if (url === '/api') sendResponse(res, 'Hello world!', 'msg');
+        if (/\/api\/books\?.+/.test(url)) handleQuery(req, res)
         if (url.startsWith('/api/books')) fetchAllItems(req, res);
         if (url.startsWith('/api/authors')) fetchAllItems(req, res); 
     } else if (method === 'POST') {
@@ -35,6 +37,17 @@ const filterItem = (res, parsedArr, header, id, extraFilter) => {
             })
             .catch((err) => console.log(err))
     }
+};
+
+const handleQuery = (req, res) => {
+    const query = req.url.slice(11).split('=');
+    const bool = query[1] === 'true' ? true : false;
+    readFile(`${__dirname}/data/books.json`, 'utf8')
+        .then((file) => {
+            const parsed = JSON.parse(file);
+            const matches = parsed.filter((book) => book.isFiction === bool)
+            sendResponse(res, matches, `${bool ? 'Fiction books' : 'Non-fiction books'}`)
+        })
 };
 
 const fetchAllItems = (req, res) => {
