@@ -14,6 +14,8 @@ const server = http.createServer((req, res) => {
     };
 });
 
+// ------ GET request handlers ----------------------------------------
+
 const sendResponse = (res, parsedObj, title) => {
     res.setHeader('Content-Type', 'application/json');
     res.status = 200
@@ -50,6 +52,8 @@ const fetchAllItems = (req, res) => {
         .catch((err) => console.log(err))
 };
 
+// -- POST request handlers ---------------------------------------------------------------
+
 const idCreator = (arr) => {
     const existingIds = arr
         .map((book) => book.bookId)
@@ -73,10 +77,8 @@ const handlePost = (input, res) => {
         .catch((err) => console.log(err))
 };
 
-
 const compileInput = (req, res) => {
     let body = ''
-
     req.on('data', (chunk) => {
         body += chunk.toString()
     });
@@ -87,8 +89,7 @@ const compileInput = (req, res) => {
     req.on('error', (err) => {
         console.log(err)
     });
-}
-
+};
 
 
 server.listen(8000, (err) => {
