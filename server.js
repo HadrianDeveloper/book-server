@@ -10,8 +10,6 @@ const server = http.createServer((req, res) => {
     }
 });
 
-
-
 const sendResponse = (res, parsedObj, title) => {
     res.setHeader('Content-Type', 'application/json');
     res.status = 200
@@ -19,11 +17,19 @@ const sendResponse = (res, parsedObj, title) => {
     res.end();
 };
 
-const filterItem = (res, parsedArr, id, header) => {
+const filterItem = (res, parsedArr, header, id, extraFilter) => {
     const idName = header === 'authors' ? 'authorId' : 'bookId';
     const targetItem = parsedArr.filter((i) => i[idName] === parseInt(id));
-    sendResponse(res, targetItem, header);
-}
+    if (!extraFilter) sendResponse(res, targetItem, header);
+    else {
+        readFile(`${__dirname}/data/authors.json`, 'utf8')
+            .then((authorsObj) => {
+                const authorId = targetItem[0].authorId;
+                filterItem(res, JSON.parse(authorsObj), 'authors', authorId)
+            })
+            .catch((err) => console.log(err))
+    }
+};
 
 const fetchAllItems = (req, res) => {
     const splitUrl = req.url.split('/');
@@ -32,7 +38,9 @@ const fetchAllItems = (req, res) => {
             if (splitUrl.length === 3) {
                 sendResponse(res, JSON.parse(content), splitUrl[2])
             } else if (splitUrl.length === 4) {
-                filterItem(res, JSON.parse(content), splitUrl[3], `${splitUrl[2]}`)
+                filterItem(res, JSON.parse(content), splitUrl[2], splitUrl[3])
+            } else {
+                filterItem(res, JSON.parse(content), splitUrl[2], splitUrl[3], splitUrl[4])
             }
         })
         .catch((err) => console.log(err))
