@@ -15,11 +15,11 @@ _Remember to use `fs/promises` to read the data files!_
 
 ## Challenges
 
-1. Create a new file called `server.js` and using Node's `http` module create a web server that responds with a status 200 and a greeting when it receives a GET request on the path `/api` (e.g. `{ message: "Hello! }`)
+1. Use Node's `http` module to create a web server that responds with a status 200 and a greeting when it receives a GET request on the path `/api` (e.g. `{ message: "Hello! }`)
 
-2. Add a GET `/api/books` endpoint that responds with a status 200 and a JSON object, that has a key of `books` with a value of the array of books from the `./data/books.json` file.
+2. GET `/api/books` endpoint serves a JSON object with a key of `books` from the `./data/books.json`
 
-3. Add a GET `/api/authors` endpoint that responds with a status 200 and a JSON object, that has a key of `authors` with a value of the array of authors from the `./data/authors.json` file.
+3. GET `/api/authors` endpoint serves a JSON object with a key of `authors` from the `./data/authors.json` file.
 
 ## More Challenges
 
