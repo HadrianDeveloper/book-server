@@ -1,21 +1,22 @@
 # Project overview
-For this project, I created a http server and implemented the `Model-view-controller` (MVP) framework to handle GET and POST requests for data stored in local JSON files. Async functionality is handled by `Promises`, and the `node:http` and `fs/promises` libraries.
+For this project, I created a two http servers to handle POST and GET requests to local JSON files containing data on books and authors. One server handles async requests using `Promises, the other using `callback functions`.
 
 # Project structure
-## /project-showcase
-An implementation of the `Model-view-controller (MVC) framework' which structures HTTP requests for book and author data from local JSON files.
+## /project-showcase 
+_Will create this showcase at a later date_
+
 
 
 ## /practice
 ## Challenges
 
-1. Use Node's `http` module to create a web server that responds with a status 200 and a greeting when it receives a GET request on the path `/api` (e.g. `{ message: "Hello! }`)
+1. Create a web server using Node's `http` module to handle the below requests:
 
 2. GET `/api/books` endpoint serves a JSON object with a key of `books` from the `./data/books.json`
 
 3. GET `/api/authors` endpoint serves a JSON object with a key of `authors` from the `./data/authors.json` file.
 
-4. GET `/api/books/:bookId` (e.g. `/api/books/1`) parametric endpoint that responds with a status 200 and a JSON object, that has a key of `book` with a value of the relevant book object from the `./data/books.json` file.
+4. GET `/api/books/:bookId` (e.g. `/api/books/1`) parametric endpoint serves a JSON object, that has a key of `book` with a value of the relevant book object from the `./data/books.json` file.
 
 5. POST `/api/books` endpoint that accepts a book object on the body of the request and adds the book to the `./data/books.json` file. The endpoint should respond with the newly created book object. Additional considerations:
 

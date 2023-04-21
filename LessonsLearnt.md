@@ -1,5 +1,3 @@
-
-
 ### Sending data from JSON
 #### data conversion
 Can be sent raw without any conversions or after JSON.stringify()
@@ -24,7 +22,7 @@ No need to encode if sending data _raw_ to client - ie can be excluded from abov
     `readFile(filePath, 'utf8)`
 
 
-#### Splitting a string by multiple delimiters
-.split accepts a standard regex:
+### Splitting a string by multiple delimiters
+.split accepts a standard regex
 
     const [endpoint, query, queryValue] = url.split(/=|\?/) 
