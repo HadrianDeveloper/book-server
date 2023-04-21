@@ -31,25 +31,17 @@ const fetchAll = (endpoint, callback, res) => {
 const fetchAnItem = (endpoint, callback, res) => {
     const [bookReq, id, authReq] = endpoint.split('/');
     fetchAll((bookReq), (err, json) => {
-        if (err) callback(err);
-        else {
-            const parsedBooks = JSON.parse(json);
-            const [idName] = queryFormatter(bookReq);
-            let target = parsedBooks.filter((i) => i[idName] === parseInt(id))
-            
-            if (authReq) {
-                const authorId = target[0].authorId;
-                return fetchAll(('authors'), (err, json) => {
-                    if (err) callback(err);
-                    else {
-                        const parsedAuthors = JSON.parse(json);
-                        let target = parsedAuthors.filter((a) => a.authorId === authorId)
-                        callback(null, JSON.stringify(target), res)
-                    }
-                })
-            }
-            callback(null, JSON.stringify(target), res);
-        }
+        let parsedArr = JSON.parse(json);
+        const [idName] = queryFormatter(bookReq);
+        let targetItem = parsedArr.filter((i) => i[idName] === parseInt(id))
+        if (err) {
+            callback(err);
+        } else if (!authReq) {
+            callback(null, JSON.stringify(targetItem), res);
+        } else {
+            const newEndpoint = `authors/${targetItem[0].authorId}`
+            fetchAnItem(newEndpoint, callback, res)
+        }    
     })
 };
 
