@@ -7,10 +7,9 @@ const server = createServer((req, res) => {
 
     if (path === 'books' || path === 'authors') fetchAll(path, packager, res);
     if (/(authors|books)\/[0-9]+$/.test(path)) fetchAnItem(path, packager, res);
-    if (/\?/.test(path)) handleBookQuery(path, packager, res);
+    if (/(authors|books)\/[0-9]+\/author$/.test(path)) fetchAnItem(path, packager, res);
+    if (/\?/.test(path)) fetchByQuery(path, packager, res);
 });
-
-
 
 
 const packager = (err, data, res) => {
@@ -30,19 +29,31 @@ const fetchAll = (endpoint, callback, res) => {
 };
 
 const fetchAnItem = (endpoint, callback, res) => {
-    const [filename, id] = endpoint.split('/');
-    fetchAll((filename), (err, json) => {
+    const [bookReq, id, authReq] = endpoint.split('/');
+    fetchAll((bookReq), (err, json) => {
         if (err) callback(err);
         else {
-            const parsedArray = JSON.parse(json);
-            const xId = filename === 'books' ? 'bookId' : 'authorId';
-            const target = parsedArray.filter((i) => i[xId] === parseInt(id))
+            const parsedBooks = JSON.parse(json);
+            const [idName] = queryFormatter(bookReq);
+            let target = parsedBooks.filter((i) => i[idName] === parseInt(id))
+            
+            if (authReq) {
+                const authorId = target[0].authorId;
+                return fetchAll(('authors'), (err, json) => {
+                    if (err) callback(err);
+                    else {
+                        const parsedAuthors = JSON.parse(json);
+                        let target = parsedAuthors.filter((a) => a.authorId === authorId)
+                        callback(null, JSON.stringify(target), res)
+                    }
+                })
+            }
             callback(null, JSON.stringify(target), res);
         }
     })
 };
 
-const handleBookQuery = (url, callback, res) => {
+const fetchByQuery = (url, callback, res) => {
     const [endpoint, query, queryValue] = url.split(/=|\?/)
     fetchAll((endpoint), (err, data) => {
         if (err) callback(err);
