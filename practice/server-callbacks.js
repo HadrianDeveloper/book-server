@@ -1,14 +1,18 @@
-const { readFile } = require('fs');
+const { readFile, writeFile } = require('fs');
 const {createServer} = require('http');
-const { queryFormatter } = require('./utils');
+const { queryFormatter, makeUID, createBookObj } = require('./utils');
 
 const server = createServer((req, res) => {
     const path = req.url.substring(5)
 
-    if (path === 'books' || path === 'authors') fetchAll(path, packager, res);
-    if (/(authors|books)\/[0-9]+$/.test(path)) fetchAnItem(path, packager, res);
-    if (/(authors|books)\/[0-9]+\/author$/.test(path)) fetchAnItem(path, packager, res);
-    if (/\?/.test(path)) fetchByQuery(path, packager, res);
+    if (req.method === 'GET') {
+        if (path === 'books' || path === 'authors') fetchAll(path, packager, res);
+        if (/(authors|books)\/[0-9]+$/.test(path)) fetchAnItem(path, packager, res);
+        if (/(authors|books)\/[0-9]+\/author$/.test(path)) fetchAnItem(path, packager, res);
+        if (/\?/.test(path)) fetchByQuery(path, packager, res);
+    } else {
+        if (path === 'books') postABook(req, packager, res)
+    }  
 });
 
 
@@ -55,6 +59,29 @@ const fetchByQuery = (url, callback, res) => {
         packager(null, JSON.stringify(results), res);
     });
 };
+
+const postABook = (req, cb, res) => {
+    let body = '';
+
+    req.on('data', (chunk) => {
+        body += chunk.toString()
+    });
+    req.on('error', (err) => {
+        cb(err)
+    });
+    req.on('end', () => {
+        const parsedObj = JSON.parse(body);
+        fetchAll(('books'), (err, json) => {
+            const parsedArr = JSON.parse(json);
+            const objToPush = createBookObj(parsedObj, parsedArr);
+            parsedArr.push(objToPush)
+            writeFile(`${__dirname}/data/books.json`, JSON.stringify(parsedArr, null, 2), (err) => {
+                err ? cb(err) : cb(null, JSON.stringify({msg: 'Book saved!'}), res)
+            })
+        })
+    });
+};
+
 
 server.listen(5000, console.log('Listening!'));
 
